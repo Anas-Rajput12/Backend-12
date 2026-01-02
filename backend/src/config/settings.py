@@ -1,32 +1,47 @@
 from pydantic_settings import BaseSettings
 from typing import Optional
+from functools import lru_cache
 
 
 class Settings(BaseSettings):
-    # API Keys and URLs
+    # =====================
+    # API Keys & URLs
+    # =====================
     openrouter_api_key: str
     qdrant_api_key: Optional[str] = None
     qdrant_url: str
     neon_database_url: str
 
-    # Model configurations
+    # =====================
+    # Model Configuration
+    # =====================
     embedding_model: str = "openai/text-embedding-3-small"
     llm_model: str = "anthropic/claude-sonnet-4.5"
 
-    # Application settings
+    # =====================
+    # App Settings
+    # =====================
     app_name: str = "RAG Chatbot API"
     debug: bool = False
     host: str = "0.0.0.0"
     port: int = 8000
 
-    # Qdrant settings
+    # =====================
+    # Qdrant Settings
+    # =====================
     qdrant_collection_name: str = "document_chunks"
 
-    # Vector settings
-    embedding_dimensions: int = 1536  # Updated for openai/text-embedding-3-small model
+    # =====================
+    # Vector Settings
+    # =====================
+    embedding_dimensions: int = 1536
 
     class Config:
         env_file = ".env"
+        extra = "ignore"
 
 
-settings = Settings()
+# ✅ IMPORTANT: Lazy-load settings (Vercel-safe)
+@lru_cache
+def get_settings() -> Settings:
+    return Settings()
